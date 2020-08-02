@@ -1,7 +1,7 @@
 // Node class
 class Node
 {
-    constructor(data,left,right)
+    constructor(data, left, right)
     {
         this.data = data;
         this.left = left;
@@ -11,14 +11,14 @@ class Node
 
 function mkBinaryTree(depth) {
   var prev = null;
-  for (i = 0; i < depth; i++) {
+  for (let i = 0; i < depth; i++) {
     prev = new Node(i,prev,prev);
   }
   return prev;
 }
 
 
-function iterator (t, f) {
+function iterator(t, f) {
   if (t == null) return;
   f(t.data);
   iterator(t.left, f);
@@ -32,7 +32,7 @@ function* tree_gen(t) {
   yield* tree_gen(t.right);
 }
 
-function generator (t, f) {
+function generator(t, f) {
   const g = tree_gen(t);
   while (true) {
     var v = g.next();
@@ -43,18 +43,24 @@ function generator (t, f) {
 
 const {performance} = require('perf_hooks');
 
-//DEBUG
-var t = mkBinaryTree(3);
-iterator (t, (e) => console.log(e));
-generator (t, (e) => console.log(e));
+function run(n, f, t) {
+  for (let i  = 0; i < n; i++) f(t, (e) => e)
+}
 
-//PERF
-var t = mkBinaryTree(25);
+let t = mkBinaryTree(25)
 
-var t0 = performance.now()
-iterator (t, (e) => e);
-console.log("Iterator:" + (performance.now() - t0) + " ms")
+// Warm up
+const W = 3
+run(W, iterator, t)
+run(W, generator, t)
 
-var t0 = performance.now()
-generator (t, (e) => e);
-console.log("Generator:" + (performance.now() - t0) + " ms")
+// Measuree
+const M = 5
+
+let t0 = performance.now()
+run(M, iterator, t)
+console.log("Iterator: " + (performance.now() - t0)/M + " ms")
+
+t0 = performance.now()
+run(M, generator, t)
+console.log("Generator: " + (performance.now() - t0)/M + " ms")
