@@ -1,16 +1,15 @@
 effect A : unit
 effect B : unit
 
+let baz () = perform A
+
+let bar () =
+  try
+    baz ()
+  with
+  effect B k -> continue k ()
+
 let foo () =
-  let baz () = perform A in
-
-  let bar () =
-    try
-      baz ()
-    with
-    effect B k -> continue k ()
-  in
-
   try
     bar ()
   with
